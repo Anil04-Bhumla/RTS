@@ -3,12 +3,10 @@ import cv2
 import numpy as np
 import os, sys
 sys.path.append(os.path.dirname(__file__))
-
-import pyximport
 import onnxruntime as ort
 
-pyximport.install(setup_args={"include_dirs": np.get_include()}, reload_support=True)
-from cython_nms import nms as cnms
+# pyximport.install(setup_args={"include_dirs": np.get_include()}, reload_support=True)
+# from cython_nms import nms as cnms
 
 def area_of(left_top, right_bottom):
     hw = np.clip(right_bottom - left_top, 0.0, None)
@@ -60,9 +58,9 @@ def predict(width, height, confidences, boxes, prob_threshold, iou_threshold=0.3
             continue
         subset_boxes = boxes[mask, :]
         box_probs = np.concatenate([subset_boxes, probs.reshape(-1, 1)], axis=1)
-        keep = cnms(box_probs, iou_threshold)
-        picked_box_probs.append(box_probs[keep])
-        picked_labels.extend([class_index] * box_probs[keep].shape[0])
+        picked = hard_nms(box_probs, iou_threshold)
+        picked_box_probs.append(picked)
+        picked_labels.extend([class_index] * picked.shape[0])
     if not picked_box_probs:
         return np.array([]), np.array([]), np.array([])
     picked_box_probs = np.concatenate(picked_box_probs)

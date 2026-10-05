@@ -20,7 +20,7 @@ def main():
     dms_model = "reborn.onnx"
 
     # Create tracker class instance
-    driver_tracker = DriverTacker(face_detector, dms_model, 5, 20, 0, device='cuda:0')
+    driver_tracker = DriverTacker(face_detector, dms_model, 5, 20, 0, device='cpu')
 
     while cap.isOpened():
 

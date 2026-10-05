@@ -55,6 +55,9 @@ class DMSInfer:
         crop_image = image[bbox[1]:bbox[3], bbox[0]:bbox[2], :] #y1:y2, x1:x2
         h, w, _ = crop_image.shape
 
+        if h <= 0 or w <= 0:
+            return np.zeros((160, 160, 3), dtype=np.uint8), ([160, 160, bbox[1], bbox[0]])
+
         crop_image = cv2.resize(crop_image, (160, 160))
         return crop_image, ([h, w, bbox[1], bbox[0]])
 
