@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+import time 
 
 class DMSInfer:
     def __init__(self, model, in_shape=(160, 160), device='cuda:0'):
@@ -68,14 +69,22 @@ class DMSInfer:
         crop_image = (crop_image - self.mean) / self.std
         crop_image = np.expand_dims(crop_image, axis=0)
         crop_image = crop_image.astype(np.float32)
+        start_time = time.perf_counter()
+
         raw = self.sess.run(None, {self.input_name: crop_image})
+
+        self.inference_latency_ms = (time.perf_counter() - start_time) * 1000
 
         return raw
 
     def detect(self, img, bbox,):
 
         crop_image, detail = self.crop_image(img, bbox)
+
+        start_time = time.perf_counter()
         raw = self.detect_internal(crop_image)
+        self.inference_latency_ms = (time.perf_counter() - start_time) * 1000
+        
 
         landmark = raw[0].reshape((-1, 2))
         euler, eyes, mouth_s = raw[1][0], raw[2][0], raw[3][0]

@@ -23,6 +23,7 @@ class DriverTacker:
         # Create inference classes instances
         self.__face_detector = FaceDetector(fd_model, device=device)
         self.__dms_infer = DMSInfer(dms_model, device=device)
+        self.inference_latency_ms = 0.0
 
         # Configurable options
         self.start_after = start_n  # Set after N consecutive valid detection
@@ -59,6 +60,7 @@ class DriverTacker:
         if self.is_tracking and self.is_last_valid:
             # Perform DMS_NET inference...
             lmks, euler, eyes, mouth_s, action = self.__dms_infer.detect(frame, self.last_valid_roi)
+            self.inference_latency_ms = self.__dms_infer.inference_latency_ms
 
             return self.is_tracking, lmks, euler, eyes, mouth_s, action
 
